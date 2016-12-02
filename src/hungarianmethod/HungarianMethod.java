@@ -1,6 +1,7 @@
 package hungarianmethod;
 
 import java.util.ArrayList;
+import java.util.Random;
 import org.apache.commons.math3.linear.Array2DRowRealMatrix;
 import org.apache.commons.math3.linear.RealMatrix;
 
@@ -28,12 +29,19 @@ public class HungarianMethod {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        double[][] d = { { 3, 6, 4, 8, 10, 15 }, 
-                         { 4, 8, 9, 10, 12, 16 }, 
-                         { 2, 4, 10, 12, 14, 15 },
-                         { 5, 6, 9, 10, 10, 11 },
-						 { 1, 2, 3, 4, 5, 6 },
-                         { 5, 6, 7, 9, 10, 12 } };
+        int n = 4;
+        double[][] d = new double[n][n];
+        for (int i = 0; i < n; i++) {
+            for (int j= 0; j < n; j++) {
+                d[i][j] = 4+ (int)(Math.random() * 10); ;
+            }
+        }
+//        double[][] d = { { 3, 6, 4, 8, 10, 15 }, 
+//                         { 4, 8, 9, 10, 12, 16 }, 
+//                         { 2, 4, 10, 12, 14, 15 },
+//                         { 5, 6, 9, 10, 10, 11 },
+//						 { 1, 2, 3, 4, 5, 6 },
+//                         { 5, 6, 7, 9, 10, 12 } };
 //		double[][] d = { { 0, 1, 1, 1, 1, 1 }, 
 //                         { 0, 1, 1, 1, 1, 1 }, 
 //                         { 0, 1, 0, 0, 1, 1 },
@@ -77,6 +85,10 @@ public class HungarianMethod {
         System.out.println("Check = " + check);
     }
 
+    public static void initMatr() {
+        
+    }
+    
     /**
      * Поиск минимального элемента в строке.
      *
