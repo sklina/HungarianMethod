@@ -30,12 +30,8 @@ public class HungarianMethod {
      */
     public static void main(String[] args) {
         int n = 4;
-        double[][] d = new double[n][n];
-        for (int i = 0; i < n; i++) {
-            for (int j= 0; j < n; j++) {
-                d[i][j] = 4+ (int)(Math.random() * 10); ;
-            }
-        }
+        double[][] d = initRandMatr(n);
+            
 //        double[][] d = { { 3, 6, 4, 8, 10, 15 }, 
 //                         { 4, 8, 9, 10, 12, 16 }, 
 //                         { 2, 4, 10, 12, 14, 15 },
@@ -85,10 +81,21 @@ public class HungarianMethod {
         System.out.println("Check = " + check);
     }
 
-    public static void initMatr() {
-        
-    }
-    
+    /**
+	 * Генерирует матрицу с случайными значениями.
+	 *
+	 * @param n размерность матрицы
+	 * @return матрица с рандомными значениями
+	 */
+	public static double[][] initRandMatr(int n) {
+		double[][] d = new double[n][n];
+		for (int i = 0; i < n; i++) {
+			for (int j = 0; j < n; j++) {
+				d[i][j] = 4 + (int) (Math.random() * 10);;
+			}
+		}
+		return d;
+	}
     /**
      * Поиск минимального элемента в строке.
      *
@@ -376,4 +383,48 @@ public class HungarianMethod {
 
         check += alpha * (matrix.getColumnDimension() - k);
     }
+	
+	public static class ZerosPosition {
+
+		private final int row;
+		private final int column;
+
+		public ZerosPosition(int row, int column) {
+			this.row = row;
+			this.column = column;
+		}
+
+		public int getRow() {
+			return row;
+		}
+
+		public int getColumn() {
+			return column;
+		}
+
+		@Override
+		public String toString() {
+			return "Zero[row=" + (row + 1)
+					+ ", column=" + (column + 1)
+					+ "]";
+		}
+
+		@Override
+		public boolean equals(Object o) {
+			if (!(o instanceof ZerosPosition)) {
+				return false;
+			}
+			ZerosPosition pairo = (ZerosPosition) o;
+			return this.row == pairo.getRow()
+					|| this.column == pairo.getColumn();
+		}
+
+		@Override
+		public int hashCode() {
+			int hash = 7;
+			hash = 19 * hash + this.row;
+			hash = 19 * hash + this.column;
+			return hash;
+		}
+	}
 }
