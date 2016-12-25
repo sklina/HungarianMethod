@@ -11,146 +11,80 @@ import java.util.List;
 
 public final class KnapsackProblem {
 
-    public final class PossibleSolution {
+	public static void main(final String[] args) {
+		final double[] c = {3, 1, 4, 5, 6};//{1.0, 6.0, 4.0, 7.0, 6.0}; // стоимость предмета
+		final double[] a = {2, 4, 7, 8, 5};//{3.0, 4.0, 5.0, 8.0, 9.0}; // вес предмета
+		final double p = 10.0;//13.0; // вместимость рюкзака
 
-        private final byte[] sol;
-        private double ksi;
-        private int indexToSplit = -1;
-		private boolean correctSolution;
-		
-		/**
-		 * Конструктор с параметром.
-		 * @param sol возможное решение
-		 */
-        public PossibleSolution(final byte[] sol) {
-            this.sol = sol;
-			correctSolution = true;
-            calcKsi();
-        }
+		Solution solution = new KnapsackProblem(c, a, p).buildKnapsackProblem();
 
-		/**
-		 * Подсчет ksi.
-		 */
-        private void calcKsi() {
-            double currentP = p;
-            for (int i = 0; i < n; i++) {
-                if (sol[i] == 1) {
-                    currentP -= a[i];
-                }
-            }
-			if (currentP < 0) {
-				correctSolution = false;
-				return;
-			}
-			
-            int i = 0;
-            while (currentP > 0 && i < n) {
-                final int index = positions[i];
-                if (sol[index] == -1) {
-                    currentP -= a[index];
-                    sol[index] = 1;
-                }
-                i++;
-            }
-            if (currentP > 0) {
-                for (int k = 0; k < n; k++) {
-                    if (sol[k] == -1) {
-                        sol[k] = 0;
-                    }
-                }
-            }
-            if (currentP != 0)
-				i = positions[--i];
-			else 
-				i = Integer.MAX_VALUE;
-            for (int j = 0; j < n; j++) {
-                if (j == i) {
-                    if (currentP < 0) {
-                        ksi += (1.0 + currentP / a[j]) * c[j];
-                        indexToSplit = j;
+		System.out.println("Решение " + stringSolution(solution.x));
+		System.out.println("Кси = " + solution.getKsi());
+	}
 
-                    } else {
-                        if (sol[j] == 1) {
-                            ksi += c[j];
-                        }
-                    }
-                } else {
-                    if (sol[j] == 1) {
-                        ksi += c[j];
-                    }
-                }
-            }
-        }
+    public static String stringSolution(byte[] arr) {
+		StringBuilder stringBuilder = new StringBuilder().append('(');
+		for (int i = 0; i < arr.length; i++) {
+			stringBuilder
+					.append(arr[i])
+					.append(", ");
+		}
+		stringBuilder.delete(stringBuilder.length()-2, stringBuilder.length());
+		return stringBuilder.append(')').toString();
+	}
+	
+	
+    private final double[] cost;
+    private final double[] weight;
+    private final double limitWeight;
+    private final int[] sequence; // порядок индексов после нанжировки
+    private final int N;
 
-        public double getKsi() {
-            return this.ksi;
-        }
-
-        public byte[] getSol() {
-            return this.sol;
-        }
-
-        public int getIndexToSplit() {
-            return this.indexToSplit;
-        }
-
-    }
-
-    private final double[] c;
-    private final double[] a;
-    private final double p;
-    private final int[] positions;
-    private final int n;
-
-    public KnapsackProblem(final double[] c, final double[] a, final double p) {
-        this.c = c;
-        this.a = a;
-        this.p = p;
-        this.n = c.length;
-        this.positions = ranging();
+    public KnapsackProblem(final double[] cost, final double[] weight, final double maxWeight) {
+        this.cost = cost;
+        this.weight = weight;
+        this.limitWeight = maxWeight;
+        this.N = cost.length;
+        this.sequence = ranging();
     }
 
 
-    public PossibleSolution run() {
-        final List<PossibleSolution> possibleSolutions = new ArrayList<>();
-        final byte[] start = new byte[n];
-        Arrays.fill(start, (byte) -1);
-        possibleSolutions.add(new PossibleSolution(start));
+    public Solution buildKnapsackProblem() {
+        final List<Solution> solutions = new ArrayList<>();
+        byte[] newSol = new byte[N];
+        Arrays.fill(newSol, (byte) -1);
+        solutions.add(new Solution(newSol));
+        Solution sol = getRecord(solutions);
 
-        PossibleSolution solution = getRecord(possibleSolutions);
-
-        while (isThereOtherSolutions(possibleSolutions, solution)) {
-            final PossibleSolution solutionToDivide = possibleSolutions.stream()
-					.filter(s -> s.getIndexToSplit() != -1)
+        while (isThereOtherSolutions(solutions, sol)) {
+            final Solution solutionToDivide = solutions.stream()
+					.filter(s -> s.getTaken() != -1)
                     .min((s1, s2) -> Double.compare(s1.getKsi(), s2.getKsi()))
                     .get();
 
-            byte[] arr = solutionToDivide.getSol().clone();
-            arr[solutionToDivide.getIndexToSplit()] = 0;
-            final PossibleSolution ps1 = new PossibleSolution(arr);
-            addCorrectSolution(possibleSolutions, ps1);
+            newSol = solutionToDivide.getX().clone();
+            newSol[solutionToDivide.getTaken()] = 0;
+            final Solution ps1 = new Solution(newSol);
+            addCorrectSolution(solutions, ps1);
 			
-            arr = solutionToDivide.getSol().clone();
-            arr[solutionToDivide.getIndexToSplit()] = 1;
-            final PossibleSolution ps2 = new PossibleSolution(arr);
-			addCorrectSolution(possibleSolutions, ps2);
+            newSol = solutionToDivide.getX().clone();
+            newSol[solutionToDivide.getTaken()] = 1;
+            final Solution ps2 = new Solution(newSol);
+			addCorrectSolution(solutions, ps2);
 			
-            possibleSolutions.remove(solutionToDivide);
+            solutions.remove(solutionToDivide);
 
-            solution = getRecord(possibleSolutions);
+            sol = getRecord(solutions);
         }
 		
-        System.out.println("Solution is " + Arrays.toString(solution.sol));
-        System.out.println("Ksi = " + solution.getKsi());
-
-        return solution;
+        return sol;
     }
-	private void addCorrectSolution(final List<PossibleSolution> solutions, PossibleSolution possibleSolution) {
+	private void addCorrectSolution(final List<Solution> solutions, Solution possibleSolution) {
 		if (possibleSolution.correctSolution) 
 			solutions.add(possibleSolution);
 	}
 	
-    private boolean isThereOtherSolutions(final List<PossibleSolution> solutions, final PossibleSolution record) {
+    private boolean isThereOtherSolutions(final List<Solution> solutions, final Solution record) {
         if (record == null) {
             return true;
         }
@@ -159,9 +93,9 @@ public final class KnapsackProblem {
                 .count() > 0;
     }
 
-    private PossibleSolution getRecord(final List<PossibleSolution> possibleSolutions) {
+    private Solution getRecord(final List<Solution> possibleSolutions) {
         return possibleSolutions.stream()
-                .filter(s -> s.getIndexToSplit() == -1)
+                .filter(s -> s.getTaken() == -1)
                 .max((s1, s2) -> Double.compare(s1.getKsi(), s2.getKsi()))
                 .orElse(null);
     }
@@ -171,19 +105,19 @@ public final class KnapsackProblem {
 	 * @return массив значений
 	 */
     private int[] ranging() {
-        final double[] ratio = new double[n];
-        final int[] result = new int[n];
+        final double[] ratio = new double[N];
+        final int[] result = new int[N];
 
 		// инициализация
-        for (int i = 0; i < n; i++) {
-            ratio[i] = c[i] / a[i];
+        for (int i = 0; i < N; i++) {
+            ratio[i] = cost[i] / weight[i];
 			result[i] = -1;
         }
 
-		for (int i = 0; i < n; i++) {
+		for (int i = 0; i < N; i++) {
 			double max = Double.NEGATIVE_INFINITY;
 			int index = -1;
-			for (int j = 0; j < n; j++) {
+			for (int j = 0; j < N; j++) {
 				if (ratio[j] > max && !isChosen(result, j, i)) {
 					max = ratio[j];
 					index = j;
@@ -214,15 +148,86 @@ public final class KnapsackProblem {
         return false;
     }
 
-    public static void main(final String[] args) {
-        final double[] c = {3, 1, 4, 5, 6};//{1.0, 6.0, 4.0, 7.0, 6.0}; // стоимость предмета
-        final double[] a = {2, 4, 7, 8, 5};//{3.0, 4.0, 5.0, 8.0, 9.0}; // вес предмета
-        final double p = 10.0;//13.0;
-        final long start = System.currentTimeMillis();
-        new KnapsackProblem(c, a, p).run();
-        System.out.println(String.format("Calc takes: %d ms", System.currentTimeMillis() - start));
+
+	public final class Solution {
+
+        private final byte[] x;
+	    private boolean correctSolution;
+        private double ksi;
+        private int taken = -1; //индекс взятого предмета
+
+        public Solution(final byte[] x) {
+            this.x = x;
+			correctSolution = true;
+            calcKsiAndCurrObj();
+        }
+
+
+        private void calcKsiAndCurrObj() {
+			double maxWeight = recalcMaxWeight();
+			
+			if (maxWeight < 0) {
+				correctSolution = false;
+				return;
+			}
+
+            int indexOfNextTaken = 0;
+            while (maxWeight > 0 && indexOfNextTaken < N) {
+                final int index = sequence[indexOfNextTaken];
+                if (x[index] == -1) {
+                    maxWeight -= weight[index];
+                    x[index] = 1;
+                }
+                indexOfNextTaken++;
+            }
+			
+			if (maxWeight < 0) 
+				taken = sequence[indexOfNextTaken - 1];
+			
+            for (int i = 0; i < N; i++) {
+                if (i == taken && maxWeight < 0) {
+					ksi += (1.0 + maxWeight / weight[i]) * cost[i];
+               } else if (x[i] == 1) {
+					ksi += cost[i];
+				}
+			}
+			
+			if (maxWeight > 0) {
+                replaceToNull();
+            }
+        }
+		
+		double recalcMaxWeight() {
+			double maxWeight = limitWeight;
+			for (int i = 0; i < N; i++) {
+                if (x[i] == 1) {
+                    maxWeight -= weight[i];
+                }
+            }
+			
+			return maxWeight;
+		}
+		
+		void replaceToNull(){
+			for (int k = 0; k < N; k++) {
+                    if (x[k] == -1) {
+                        x[k] = 0;
+                    }
+                }
+		}
+
+        public double getKsi() {
+            return this.ksi;
+        }
+
+        public byte[] getX() {
+            return this.x;
+        }
+
+        public int getTaken() {
+            return this.taken;
+        }
+
     }
-
-
 }
 
