@@ -51,28 +51,28 @@ public final class KnapsackProblem {
 
     public Solution buildKnapsackProblem() {
         final List<Solution> solutions = new ArrayList<>();
-        byte[] newSol = new byte[N];
-        Arrays.fill(newSol, (byte) -1);
-        solutions.add(new Solution(newSol));
+        byte[] newX= new byte[N];
+        Arrays.fill(newX, (byte) -1);
+        solutions.add(new Solution(newX));
         Solution sol = getRecord(solutions);
 
         while (isThereOtherSolutions(solutions, sol)) {
-            final Solution solutionToDivide = solutions.stream()
+            final Solution nodeSol = solutions.stream()
 					.filter(s -> s.getTaken() != -1)
                     .min((s1, s2) -> Double.compare(s1.getKsi(), s2.getKsi()))
                     .get();
 
-            newSol = solutionToDivide.getX().clone();
-            newSol[solutionToDivide.getTaken()] = 0;
-            final Solution ps1 = new Solution(newSol);
+            newX = nodeSol.getX().clone();
+            newX[nodeSol.getTaken()] = 0;
+            final Solution ps1 = new Solution(newX);
             addCorrectSolution(solutions, ps1);
 			
-            newSol = solutionToDivide.getX().clone();
-            newSol[solutionToDivide.getTaken()] = 1;
-            final Solution ps2 = new Solution(newSol);
+            newX = nodeSol.getX().clone();
+            newX[nodeSol.getTaken()] = 1;
+            final Solution ps2 = new Solution(newX);
 			addCorrectSolution(solutions, ps2);
 			
-            solutions.remove(solutionToDivide);
+            solutions.remove(nodeSol);
 
             sol = getRecord(solutions);
         }
