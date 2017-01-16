@@ -29,8 +29,8 @@ public class HungarianMethod {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        int n = 4;
-        double[][] d = initRandMatr(n);
+        int n = 6;
+//        double[][] d = initRandMatr(n);
             
 //        double[][] d = { { 3, 6, 4, 8, 10, 15 }, 
 //                         { 4, 8, 9, 10, 12, 16 }, 
@@ -38,12 +38,12 @@ public class HungarianMethod {
 //                         { 5, 6, 9, 10, 10, 11 },
 //						 { 1, 2, 3, 4, 5, 6 },
 //                         { 5, 6, 7, 9, 10, 12 } };
-//		double[][] d = { { 0, 1, 1, 1, 1, 1 }, 
-//                         { 0, 1, 1, 1, 1, 1 }, 
-//                         { 0, 1, 0, 0, 1, 1 },
-//                         { 0, 1, 0, 0, 1, 1 },
-//			 { 0, 1, 0, 0, 0, 1 },
-//                         { 0, 0, 0, 0, 0, 0 } };
+		double[][] d = { { 0, 1, 1, 1, 1, 1 }, 
+                         { 0, 1, 1, 1, 1, 1 }, 
+                         { 0, 1, 0, 0, 1, 1 },
+                         { 0, 1, 0, 0, 1, 1 },
+			             { 0, 1, 0, 0, 0, 1 },
+                         { 0, 0, 0, 0, 0, 0 } };
 //        double[][] d = {{2, 4, 1, 3, 3, 2},
 //        {1, 5, 4, 1, 2, 1},
 //        {3, 5, 2, 2, 4, 4},
